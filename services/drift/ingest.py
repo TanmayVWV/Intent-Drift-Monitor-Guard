@@ -4,6 +4,7 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 import psycopg2, psycopg2.extras
 from drift_core import generate_report
+from db_bootstrap import ensure_schema
 
 DB_URL = os.getenv("DATABASE_URL", "postgresql://dev:dev@localhost:5432/drift")
 app = FastAPI(title="Drift Ingest")
@@ -11,10 +12,12 @@ app = FastAPI(title="Drift Ingest")
 def get_conn():
     return psycopg2.connect(DB_URL)
 
+DASH_ORIGIN = "https://intent-drift-monitor-guard.onrender.com"
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   
-    allow_credentials=True,
+    allow_origins=[DASH_ORIGIN],   
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
