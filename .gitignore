@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+.venv/
+.env
+
+# Node / Vite
+node_modules/
+web/node_modules/
+web/.vite/
+web/dist/
+
+# OS / Editors / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+*.log
+
+# Docker
+**/.dockerignore
