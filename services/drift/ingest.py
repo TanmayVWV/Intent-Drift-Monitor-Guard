@@ -33,13 +33,18 @@ def health():
 
 @app.get("/debug/env")
 def debug_env():
-    db = os.getenv("DATABASE_URL", "")
-    base = os.getenv("BASELINE_PATH", "")
-    return JSONResponse({
-        "database_url_prefix": db[:15] + "..." if db else None,
-        "baseline_path": base or None,
-        "baseline_is_file": os.path.isfile(base) if base else None,
-    })
+    try:
+        db = os.getenv("DATABASE_URL", "")
+        base = os.getenv("BASELINE_PATH", "")
+        exists = (Path(base).is_file() if base else None)
+        return {
+            "database_url_prefix": (db[:25] + "...") if db else None,
+            "baseline_path": base or None,
+            "baseline_exists": exists,
+        }
+    except Exception as e:
+        # Never 500—return the error in JSON so we can see it
+        return JSONResponse(status_code=200, content={"debug_error": str(e)})
 
 @app.post("/v1/ingest")
 def ingest(items: List[Any]):
