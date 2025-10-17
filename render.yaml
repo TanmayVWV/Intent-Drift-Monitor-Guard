@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: drift-api
+    runtime: python            # <-- use runtime, not env
+    plan: free
+    rootDir: services/drift
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn ingest:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: drift-db
+          property: connectionString
+      - key: BASELINE_PATH
+        value: /opt/render/project/src/db/baseline_payments_api.json
+      - key: DRIFT_WINDOW_MINUTES
+        value: "60"
+
+  - type: static               # <-- not "static_site"
+    name: drift-dashboard
+    plan: free
+    rootDir: web
+    buildCommand: npm ci && npm run build
+    publishPath: dist          # <-- not "staticPublishPath"
+    envVars:
+      - key: VITE_API_BASE
+        value: https://drift-api.onrender.com  # replace after API is live
+
+databases:
+  - name: drift-db
+    plan: free
