@@ -31,6 +31,16 @@ def reports_latest(window_minutes: int = Query(None, ge=1, le=1440)):
 def health():
     return {"ok": True}
 
+@app.get("/debug/env")
+def debug_env():
+    db = os.getenv("DATABASE_URL", "")
+    base = os.getenv("BASELINE_PATH", "")
+    return JSONResponse({
+        "database_url_prefix": db[:15] + "..." if db else None,
+        "baseline_path": base or None,
+        "baseline_is_file": os.path.isfile(base) if base else None,
+    })
+
 @app.post("/v1/ingest")
 def ingest(items: List[Any]):
     if not isinstance(items, list) or not items:

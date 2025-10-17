@@ -12,7 +12,16 @@ BASELINE = os.getenv("BASELINE_PATH", str(REPO_ROOT / "db" / "baseline_payments_
 WINDOW_MINUTES = int(os.getenv("DRIFT_WINDOW_MINUTES", "30"))
 
 def _load_baseline():
-    with open(BASELINE, "r", encoding="utf-8") as f:
+    if BASELINE.startswith(("postgres://", "postgresql://")):
+        raise RuntimeError(
+            f"BASELINE_PATH looks like a database URL, not a file path: {BASELINE[:32]}..."
+        )
+    p = Path(BASELINE)
+    if not p.is_file():
+        # Helpful message rather than crashing with FileNotFoundError
+        raise FileNotFoundError(f"Baseline JSON not found at {p}. "
+                                f"Set BASELINE_PATH=/opt/render/project/src/db/baseline_payments_api.json")
+    with p.open("r", encoding="utf-8") as f:
         return json.load(f)
 
 def _load_live_rows(window_minutes: int = None):
