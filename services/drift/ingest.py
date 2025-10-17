@@ -16,10 +16,10 @@ DASH_ORIGIN = "https://intent-drift-monitor-guard.onrender.com"
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[DASH_ORIGIN],   
-    allow_credentials=False,
+    allow_origins=[DASH_ORIGIN],  
     allow_methods=["*"],
     allow_headers=["*"],
+    allow_credentials=True,      
 )
 
 @app.get("/reports/latest")
